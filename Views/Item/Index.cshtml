@@ -1,0 +1,138 @@
+﻿@model IEnumerable<AJAX.Models.Item>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee List</title>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            margin: 0;
+        }
+
+        h2 {
+            color: #007bff;
+        }
+
+        #itemList {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        #itemList li {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+        }
+
+        #itemForm {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        #itemForm label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        #itemForm input {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #itemForm button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #itemForm button:hover {
+            background-color: #0056b3;
+        }
+
+        .alert {
+            color: #d9534f;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+            $('#itemForm').on('submit', function (e) {
+                e.preventDefault();
+
+                var itemName = $('#itemName').val().trim();
+
+                if (itemName === '') {
+                    alert('Item name cannot be empty.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '@Url.Action("AddItem", "Item")',
+                    type: 'POST',
+                    data: { name: itemName },
+                    success: function (response) {
+                        if (response.success) {
+                            var newItem = $('<li></li>').text(response.item.name);
+                            $('#itemList').append(newItem);
+                            $('#itemForm')[0].reset();
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('An error occurred. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Employee List</h1>
+    <ul id="itemList">
+        @foreach (var item in Model)
+        {
+            <li>@item.Name</li>
+        }
+    </ul>
+    
+    <h2>Add New Employee</h2>
+    <form id="itemForm">
+        <label for="itemName">Employee Name:</label>
+        <input type="text" id="itemName" name="itemName" required>
+        <button type="submit">Add Item</button>
+    </form>
+</body>
+</html>
